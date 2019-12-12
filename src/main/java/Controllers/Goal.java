@@ -22,17 +22,16 @@ public class Goal {
 
         }
 
-        public static void insertGoal(String Goal1, String DateAchieveBy, boolean Achieved, int WorkoutPlanID, int UserID){
+        public static void insertGoal(String Goal1, String DateAchieveBy, boolean Achieved, int UserID, int WorkoutPlanID){
 
             try {
 
-
-                PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Goal (Goal1, DateAchieveBy, Achieved, WorkoutPlanID, UserID) VALUES (?, ?, ?, ?, ?)");
+                PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Goal (Goal1, DateAchieveBy, Achieved, UserID, WorkoutPlanID) VALUES (?, ?, ?, ?, ?)");
                 ps.setString(1, Goal1);
                 ps.setString(2, DateAchieveBy);
                 ps.setBoolean(3, Achieved);
-                ps.setInt(4, WorkoutPlanID);
-                ps.setInt(5, UserID);
+                ps.setInt(4, UserID);
+                ps.setInt(5, WorkoutPlanID);
 
                 ps.executeUpdate();
                 System.out.println("Record added a new goal to Goal table");
@@ -45,7 +44,7 @@ public class Goal {
 
         public static void listGoal() {
             try {
-                PreparedStatement ps = Main.db.prepareStatement("SELECT Goal1, DateAchieveBy, Achieved, WorkoutPlan.WorkoutName, UserName FROM Goal INNER JOIN WorkoutPlan ON Goal.WorkoutPlanID = WorkoutPlan.WorkoutPlanID INNER JOIN User ON Goal.UserID = User.UserID");
+                PreparedStatement ps = Main.db.prepareStatement("SELECT Goal1, DateAchieveBy, Achieved, User.UserName, WorkoutPlan.WorkoutName FROM Goal INNER JOIN User ON Goal.UserID = User.UserID INNER JOIN WorkoutPlan ON Goal.WorkoutPlanID = WorkoutPlan.WorkoutPlanID");
 
                 ResultSet results = ps.executeQuery();
 
@@ -54,11 +53,10 @@ public class Goal {
                     String Goal1 = results.getString(1);
                     String DateAchieveBy = results.getString(2);
                     Boolean Achieved = results.getBoolean(3);
-                    String WorkoutName = results.getString(4);
-                    int UserID = results.getInt(5);
-                    String UserName = results.getString(6);
+                    String UserName = results.getString(4);
+                    String WorkoutName = results.getString(5);
 
-                    System.out.println("UserName: " + UserName + ", Goal: " + Goal1 + ", DateAchieveBy: " + DateAchieveBy + ", Achieved: " + Achieved + ", Workout name: " + WorkoutName);
+                    System.out.println("UserName: " + UserName + ", Goal: " + Goal1 + ", DateAchieveBy: " + DateAchieveBy + ", Achieved: " + Achieved + ", WorkoutPlan: " + WorkoutName);
                 }
 
             } catch (Exception exception) {
@@ -67,14 +65,14 @@ public class Goal {
 
         }
 
-        public static void updateGoal(String Goal1, Boolean Achieved){
+        public static void updateGoal(int GoalID, Boolean Achieved){
             try {
 
-                PreparedStatement ps = Main.db.prepareStatement("UPDATE Goal SET Achieved = ?, WHERE Goal1 = ?");
+                PreparedStatement ps = Main.db.prepareStatement("UPDATE Goal SET Achieved = ? WHERE GoalID = ?");
                 ps.setBoolean(1, Achieved);
-                ps.setString(2, Goal1);
+                ps.setInt(2, GoalID);
                 ps.executeUpdate();
-                System.out.println(Goal1 + " has updated Achieved, to: " + Achieved);
+                System.out.println(GoalID + " has updated Achieved, to: " + Achieved);
 
             } catch (Exception e) {
 

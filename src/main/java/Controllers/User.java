@@ -1,8 +1,14 @@
 package Controllers;
 
 import Server.Main;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
@@ -44,33 +50,33 @@ public class User {
         }
 
 
-
-        public static void listUser() {
+        
+        @GET
+        @Path("list")
+        @Produces(MediaType.APPLICATION_JSON)
+        public String listUser() {
+            System.out.println("user/list");
+            JSONArray list = new JSONArray();
             try {
-
-                PreparedStatement ps = Main.db.prepareStatement("SELECT UserName, Goal1, DateAchieveBy, Achieved FROM User INNER JOIN Goal ON User.UserID = Goal.UserID");  //Inner Join used to join together the User and Goal table using UserID.
-
+                PreparedStatement ps = Main.db.prepareStatement("SELECT UserName FROM User");
                 ResultSet results = ps.executeQuery();
-
                 while (results.next()) {
-                    String UserName = results.getString(1);
-                    String Goal1 = results.getString(2);
-                    String DateAchieveBy = results.getString(3);
-                    boolean Achieved = results.getBoolean(4);       //Code that gets the results in the right data type matching to the database.
+                    JSONObject item = new JSONObject();
+                    item.put("UserName", results.getString(1));
 
-                    //Print statement explaining the data for each field that has is in the database.
-                    System.out.println("UserName: " + UserName + ", Goal:  " + Goal1 + ", DateAchieveBy: " + new SimpleDateFormat("yyyy-mm-dd").parse(DateAchieveBy) + ", Achieved: " + Achieved);
-                                    //"new SimpleDateFormat("yyyy-mm-dd").parse(DateAchieveBy)" enables javascript to parse the date for DateAchieveBy.
+                    list.add(item);
                 }
+                return list.toString();
 
             } catch (Exception exception) {
                 System.out.println("Database error: " + exception.getMessage());
+                return "{\"error\": \"Unable to list items, please see server console for more info.\"}";
             }
-
         }
 
 
-        public static void updateUser (int UserID, String UserName, String Password){
+
+    public static void updateUser (int UserID, String UserName, String Password){
             try {
 
                 PreparedStatement ps = Main.db.prepareStatement("UPDATE User SET UserName = ?, Password = ? WHERE UserID = ?");

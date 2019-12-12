@@ -9,7 +9,7 @@ public class WOPlanExercises {
 
     public static void insertWOPlanExercises(int WorkoutPlanID, int ExerciseID, int NoOfSets, int NoOfReps){
         try {
-            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO WOPlanExercises (WorkoutPlanID, ExerciseID, NoOfSets, NoOfSets) VALUES (?, ?, ?, ?)");
+            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO WOPlanExercises (WorkoutPlanID, ExerciseID, NoOfSets, NoOfReps) VALUES (?, ?, ?, ?)");
             ps.setInt(1, WorkoutPlanID);
             ps.setInt(2, ExerciseID);
             ps.setInt(3, NoOfSets);
@@ -17,7 +17,7 @@ public class WOPlanExercises {
 
             ps.executeUpdate();
 
-            System.out.println("Record added a Workout Plan to WorkoutPlan table");
+            System.out.println("Record added an exercise " + ExerciseID + " to WOPlanExercises table");
 
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
@@ -27,7 +27,7 @@ public class WOPlanExercises {
 
     public static void listWOPlanExercises() {
         try {
-            PreparedStatement ps = Main.db.prepareStatement("SELECT WorkoutPlan.WorkoutName, Exercise.ExerciseName, NoOfSets, NoOfReps FROM WOPlanExercises INNER JOIN WorkoutPlan ON WOPlanExercises.WorkoutPlanID = WorkoutPlan.WorkoutPlanID INNER JOIN Exercise ON WOPlanExercises.ExerciseID = Exercise.ExerciseID");
+            PreparedStatement ps = Main.db.prepareStatement("SELECT WorkoutPlan.WorkoutName, Exercise.ExerciseName, NoOfSets, NoOfReps FROM WOPlanExercises WPE INNER JOIN WorkoutPlan ON WPE.WorkoutPlanID = WorkoutPlan.WorkoutPlanID INNER JOIN Exercise ON WPE.ExerciseID = Exercise.ExerciseID");
             ResultSet results = ps.executeQuery();
             while (results.next()) {
                 String WorkoutName = results.getString(1);
@@ -45,17 +45,19 @@ public class WOPlanExercises {
 
     }
 
-    public static void updateWOPlanExercises (int NoOfReps, int NoOfSets, int ExerciseID){
+    public static void updateWOPlanExercises (int WorkoutPlanID, int ExerciseID, int NoOfSets, int NoOfReps){
         try {
 
-            PreparedStatement ps = Main.db.prepareStatement("UPDATE WOPlanExercises SET NoOfReps = ?, NoOfSets = ? WHERE ExerciseID = ?");
-            ps.setInt(1, NoOfReps);
-            ps.setInt(2, NoOfSets);
-            ps.setInt(3, ExerciseID);
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE WOPlanExercises SET NoOfSets = ?, NoOfReps = ? WHERE WorkoutPlanID =? AND ExerciseID = ?");
+
+            ps.setInt(1, WorkoutPlanID);
+            ps.setInt(2, ExerciseID);
+            ps.setInt(3, NoOfSets);
+            ps.setInt(4, NoOfReps);
 
             ps.executeUpdate();
 
-            System.out.println(ExerciseID + " has been updated. " + "No Of Reps: " + NoOfReps + ", No Of Sets: " + NoOfSets);
+            System.out.println("WorkoutPlanID: " + WorkoutPlanID + ", has been updated. Where ExerciseID is " + ExerciseID + ". No Of Sets: " + NoOfSets + ", No Of Reps: " + NoOfReps);
 
         } catch (Exception e) {
 
@@ -65,15 +67,16 @@ public class WOPlanExercises {
 
     }
 
-    public static void deleteWOPlanExercises(int ExerciseID){
+    public static void deleteWOPlanExercises(int WorkoutPlanID, int ExerciseID){
         try {
 
-            PreparedStatement ps = Main.db.prepareStatement("DELETE FROM WOPlanExercises WHERE ExerciseID = ?");
-            ps.setInt(1, ExerciseID);
+            PreparedStatement ps = Main.db.prepareStatement("DELETE FROM WOPlanExercises WHERE WorkoutPlanID = ? AND ExerciseID = ?");
+            ps.setInt(1, WorkoutPlanID);
+            ps.setInt(2, ExerciseID);
 
             ps.executeUpdate();
 
-            System.out.println("Deleted record " + ExerciseID + " from WorkoutPlan table");
+            System.out.println("Deleted record with WorkoutPlanID: " + WorkoutPlanID + ", and ExerciseID: " + ExerciseID + " from WOPlanExercises table");
 
         } catch (Exception e) {
             System.out.println(e.getMessage());

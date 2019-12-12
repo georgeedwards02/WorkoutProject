@@ -7,12 +7,11 @@ import java.sql.ResultSet;
 
 public class WorkoutPlan {
 
-        public static void insertWorkoutPlan(int WorkoutPlanID, String WorkoutName, int GoalID){
+        public static void insertWorkoutPlan(int WorkoutPlanID, String WorkoutName){
             try {
-                PreparedStatement ps = Main.db.prepareStatement("INSERT INTO WorkoutPlan (WorkoutPlanID, WorkoutName, GoalID) VALUES (?, ?, ?)");
+                PreparedStatement ps = Main.db.prepareStatement("INSERT INTO WorkoutPlan (WorkoutPlanID, WorkoutName) VALUES (?, ?)");
                 ps.setInt(1, WorkoutPlanID);
                 ps.setString(2, WorkoutName);
-                ps.setInt(3, GoalID);
 
                 ps.executeUpdate();
                 System.out.println("Record added a Workout Plan to WorkoutPlan table");
@@ -26,17 +25,14 @@ public class WorkoutPlan {
 
         public static void listWorkoutPlan() {
             try {
-                PreparedStatement ps = Main.db.prepareStatement("SELECT WorkoutName, Exercise.ExerciseName, WPE.NoOfSets, WPE.NoOfReps FROM WorkoutPlan INNER JOIN WOPlanExercises WPE ON WorkoutPlan.WorkoutPlanID = WPE.WorkoutPlanID INNER JOIN Exercise ON Exercise.ExerciseID = WOPlanExercises.ExerciseID ");
+                PreparedStatement ps = Main.db.prepareStatement("SELECT WorkoutName, Goal.Goal1 FROM WorkoutPlan INNER JOIN Goal ON WorkoutPlan.WorkoutPlanID = Goal.WorkoutPlanID ");
                 ResultSet results = ps.executeQuery();
 
                 while (results.next()) {
                     String WorkoutName = results.getString(1);
-                    int NoOfSets = results.getInt(2);
-                    int NoOfReps = results.getInt(3);
-                    String ExerciseName = results.getString(4);
+                    String Goal1 = results.getString(2);
 
-
-                    System.out.println("WorkoutName: " + WorkoutName + ", ExerciseName: " + ExerciseName + ", No Of Reps: " + NoOfReps + ", No Of Sets: " + NoOfSets);
+                    System.out.println("WorkoutName: " + WorkoutName + ", Goal: " + Goal1);
                 }
 
             } catch (Exception exception) {
@@ -49,13 +45,14 @@ public class WorkoutPlan {
         public static void updateWorkoutPlan(int WorkoutPlanID, String WorkoutName){
             try {
 
-                PreparedStatement ps = Main.db.prepareStatement("UPDATE WorkoutPlan SET WorkoutName = ?, WHERE WorkoutPlanID = ?");
-                ps.setString(1, WorkoutName);
-                ps.setInt(2, WorkoutPlanID);
+                PreparedStatement ps = Main.db.prepareStatement("UPDATE WorkoutPlan SET WorkoutName = ? WHERE WorkoutPlanID = ?");
+                ps.setInt(1, WorkoutPlanID);
+                ps.setString(2, WorkoutName);
+
 
                 ps.executeUpdate();
 
-                System.out.println(WorkoutPlanID + " has been updated. " + " New WorkoutName: "+ WorkoutName);
+                System.out.println("WorkoutPlanID: " + WorkoutPlanID + ", has been updated. " + " New WorkoutName: " + WorkoutName);
 
             } catch (Exception e) {
 
